@@ -1,0 +1,8 @@
+com.fingersoft.hillclimb&pcampaignid
+com.supercell.clashofclans   
+com.mojang.minecraftpe        
+com.robtopx.geometryjump      
+com.rockstargames.gtasa         
+com.riotgames.league.wildrift  
+com.kiloo.subwaysurf          
+com.miniclip.eightballpool     
