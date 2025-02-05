@@ -5,17 +5,15 @@ import os
 
 load_dotenv()
 
-db_password = os.getenv("DB_PASSWORD")
-
 app = Flask(__name__)
 
 # Connect to MySQL
 def get_db_connection():
     return mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password=db_password,
-        database="apk_database"
+        host="DB_HOST",
+        user="DB_USER",
+        password="DB_PASSWORD",
+        database="DB_NAME"
     )
 
 @app.route('/apps', methods=['GET'])
