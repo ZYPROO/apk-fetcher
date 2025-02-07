@@ -3,19 +3,21 @@ from dotenv import load_dotenv
 import mysql.connector
 import os
 
+# Load environment variables from .env file
 load_dotenv()
 
 app = Flask(__name__)
 
-# Connect to MySQL
+# Connect to MySQL database
 def get_db_connection():
     return mysql.connector.connect(
-        host="DB_HOST",
-        user="DB_USER",
-        password="DB_PASSWORD",
-        database="DB_NAME"
+        host=os.getenv("DB_HOST"),
+        user=os.getenv("DB_USER"),
+        password=os.getenv("DB_PASSWORD"),
+        database=os.getenv("DB_NAME")
     )
 
+# API endpoint to get app data/
 @app.route('/apps', methods=['GET'])
 def get_apps():
     conn = get_db_connection()
@@ -27,4 +29,4 @@ def get_apps():
     return jsonify(apps)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000)
