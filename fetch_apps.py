@@ -1,5 +1,5 @@
 from google_play_scraper import app
-import mysql.connector
+import psycopg2
 import time
 from dotenv import load_dotenv
 import os
@@ -10,17 +10,16 @@ def read_package_names(file_path):
     with open(file_path, "r") as f:
         return [line.strip() for line in f.readlines()]
 
-# Connect to MySQL database
-db = mysql.connector.connect(
-    host=os.getenv("DB_HOST"),
-    user=os.getenv("DB_USER"),
-    password=os.getenv("DB_PASSWORD"),
-    database=os.getenv("DB_NAME"),
-    port=os.getenv("DB_PORT")
+# Connect to PostgreSQL
+db = psycopg2.connect(
+    host=os.getenv("PGHOST"),
+    user=os.getenv("PGUSER"),
+    password=os.getenv("PGPASSWORD"),
+    database=os.getenv("PGDATABASE"),
+    port=os.getenv("PGPORT")
 )
 
 cursor = db.cursor()
-
 app_packages = read_package_names("packages.txt")
 
 # Function to fetch and store app data
@@ -33,14 +32,14 @@ def fetch_and_store():
             icon_url = data['icon']
             screenshot_url = ','.join(data['screenshots'][:3])  # Store up to 3 screenshots
 
-            # Insert data into MySQL table
+            # Insert data into PostgreSQL table
             sql = """
                 INSERT INTO apps (name, package_name, version, icon_url, screenshot_url)
                 VALUES (%s, %s, %s, %s, %s)
-                ON DUPLICATE KEY UPDATE version=%s, icon_url=%s, screenshot_url=%s
+                ON CONFLICT (package_name)
+                DO UPDATE SET version = EXCLUDED.version, icon_url = EXCLUDED.icon_url, screenshot_url = EXCLUDED.screenshot_url
             """
-            values = (name, package, version, icon_url, screenshot_url, version, icon_url, screenshot_url)
-
+            values = (name, package, version, icon_url, screenshot_url)
             cursor.execute(sql, values)
             db.commit()
 
