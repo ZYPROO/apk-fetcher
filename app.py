@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 from flask_cors import CORS
 from dotenv import load_dotenv
 import psycopg2
@@ -21,9 +21,18 @@ def get_db_connection():
 
 @app.route('/apps', methods=['GET'])
 def get_apps():
+    package_name = request.args.get('package_name')  # Get 'package_name' from query params
+
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM apps")
+
+    if package_name:
+        # Filter apps by package_name if provided
+        cursor.execute("SELECT * FROM apps WHERE package_name = %s", (package_name,))
+    else:
+        # Fetch all apps if no package_name is provided
+        cursor.execute("SELECT * FROM apps")
+
     apps = cursor.fetchall()
     cursor.close()
     conn.close()
