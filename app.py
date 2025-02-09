@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify
 from flask_cors import CORS
 from dotenv import load_dotenv
 import psycopg2
@@ -19,25 +19,16 @@ def get_db_connection():
         port=os.getenv("PGPORT")
     )
 
+# Fetch all apps
 @app.route('/apps', methods=['GET'])
 def get_apps():
-    package_name = request.args.get('package_name')  # Get 'package_name' from query params
-
     conn = get_db_connection()
     cursor = conn.cursor()
-
-    if package_name:
-        # Filter apps by package_name if provided
-        cursor.execute("SELECT * FROM apps WHERE package_name = %s", (package_name,))
-    else:
-        # Fetch all apps if no package_name is provided
-        cursor.execute("SELECT * FROM apps")
-
+    cursor.execute("SELECT * FROM apps")
     apps = cursor.fetchall()
     cursor.close()
     conn.close()
     
-    # Convert results to JSON format
     app_list = []
     for app_data in apps:
         app_list.append({
@@ -46,9 +37,32 @@ def get_apps():
             "package_name": app_data[2],
             "version": app_data[3],
             "icon_url": app_data[4],
-            "screenshot_url": app_data[5]
+            "screenshots": app_data[5].split(',')  # Convert comma-separated screenshots into a list
         })
     return jsonify(app_list)
+
+# Fetch app by package_name
+@app.route('/apps/<package_name>', methods=['GET'])
+def get_app_by_package(package_name):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM apps WHERE package_name = %s", (package_name,))
+    app_data = cursor.fetchone()
+    cursor.close()
+    conn.close()
+
+    if app_data:
+        app_info = {
+            "id": app_data[0],
+            "name": app_data[1],
+            "package_name": app_data[2],
+            "version": app_data[3],
+            "icon_url": app_data[4],
+            "screenshots": app_data[5].split(',')  # Convert comma-separated screenshots into a list
+        }
+        return jsonify(app_info)
+    else:
+        return jsonify({"error": "App not found"}), 404
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
