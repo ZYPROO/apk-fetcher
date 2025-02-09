@@ -24,7 +24,7 @@ def get_db_connection():
 def get_apps():
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM apps")
+    cursor.execute("SELECT * FROM apps ORDER BY id ASC")
     apps = cursor.fetchall()
     cursor.close()
     conn.close()
