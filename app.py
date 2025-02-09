@@ -17,7 +17,7 @@ def get_db_connection():
         port=os.getenv("PGPORT")
     )
 
-@app.route('/', methods=['GET'])
+@app.route('/apps', methods=['GET'])
 def get_apps():
     conn = get_db_connection()
     cursor = conn.cursor()
