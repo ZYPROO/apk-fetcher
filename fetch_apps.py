@@ -27,25 +27,32 @@ def fetch_and_store():
     for package in app_packages:
         try:
             data = app(package)
+
             name = data['title']
             version = data['version']
             icon_url = data['icon']
-            screenshots = ','.join(data['screenshots'][:5])  # Store up to 5 screenshots
-            
+            company = data.get('developer', 'Unknown')  # Fetch company name
+            screenshot_urls = ','.join(data['screenshots'])  # Store all available screenshots
+
             # Insert data into PostgreSQL table
             sql = """
-                INSERT INTO apps (name, package_name, version, icon_url, screenshot_url)
-                VALUES (%s, %s, %s, %s, %s)
+                INSERT INTO apps (name, package_name, version, icon_url, screenshot_url, company)
+                VALUES (%s, %s, %s, %s, %s, %s)
                 ON CONFLICT (package_name)
-                DO UPDATE SET version = EXCLUDED.version, icon_url = EXCLUDED.icon_url, screenshot_url = EXCLUDED.screenshot_url
+                DO UPDATE SET 
+                    version = EXCLUDED.version, 
+                    icon_url = EXCLUDED.icon_url, 
+                    screenshot_url = EXCLUDED.screenshot_url,
+                    company = EXCLUDED.company
             """
-            values = (name, package, version, icon_url, screenshots)
+            values = (name, package, version, icon_url, screenshot_urls, company)
+
             cursor.execute(sql, values)
             db.commit()
 
             print(f"✅ Fetched and stored: {name} (Version: {version})")
 
-            # Add a short delay to prevent rate-limiting
+            # Add a short delay to prevent getting blocked
             time.sleep(2)
 
         except Exception as e:

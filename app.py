@@ -19,16 +19,16 @@ def get_db_connection():
         port=os.getenv("PGPORT")
     )
 
-# Fetch all apps
+# Route 1: Get All Apps
 @app.route('/apps', methods=['GET'])
 def get_apps():
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM apps ORDER BY id ASC")
+    cursor.execute("SELECT * FROM apps")
     apps = cursor.fetchall()
     cursor.close()
     conn.close()
-    
+
     app_list = []
     for app_data in apps:
         app_list.append({
@@ -37,11 +37,13 @@ def get_apps():
             "package_name": app_data[2],
             "version": app_data[3],
             "icon_url": app_data[4],
-            "screenshots": app_data[5].split(',')  # Convert comma-separated screenshots into a list
+            "screenshots": app_data[5].split(',')[:8] if app_data[5] else [],
+            "company": app_data[6]  # If you have the company column
         })
+
     return jsonify(app_list)
 
-# Fetch app by package_name
+# Route 2: Get Specific App by Package Name
 @app.route('/apps/<package_name>', methods=['GET'])
 def get_app_by_package(package_name):
     conn = get_db_connection()
@@ -58,7 +60,8 @@ def get_app_by_package(package_name):
             "package_name": app_data[2],
             "version": app_data[3],
             "icon_url": app_data[4],
-            "screenshots": app_data[5].split(',')  # Convert comma-separated screenshots into a list
+            "screenshots": app_data[5].split(',')[:8] if app_data[5] else [],
+            "company": app_data[6]  # Adjust if you have the company column
         }
         return jsonify(app_info)
     else:
