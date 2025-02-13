@@ -22,11 +22,7 @@ db = psycopg2.connect(
 cursor = db.cursor()
 app_packages = read_package_names("packages.txt")
 
-# Step 1: Remove outdated data (apps not in packages.txt)
-cursor.execute("DELETE FROM apps WHERE package_name NOT IN %s", (tuple(app_packages),))
-db.commit()
-
-# Step 2: Fetch and store the latest data
+# Function to fetch and store app data
 def fetch_and_store():
     for package in app_packages:
         try:
@@ -38,7 +34,7 @@ def fetch_and_store():
             company = data.get('developer', 'Unknown')  # Fetch company name
             screenshot_urls = ','.join(data['screenshots'])  # Store all available screenshots
 
-            # Insert or update the database
+            # Insert data into PostgreSQL table
             sql = """
                 INSERT INTO apps (name, package_name, version, icon_url, screenshot_url, company)
                 VALUES (%s, %s, %s, %s, %s, %s)
@@ -54,9 +50,9 @@ def fetch_and_store():
             cursor.execute(sql, values)
             db.commit()
 
-            print(f"✅ Updated: {name} (Version: {version})")
+            print(f"✅ Fetched and stored: {name} (Version: {version})")
 
-            # Short delay to prevent rate limiting
+            # Add a short delay to prevent getting blocked
             time.sleep(2)
 
         except Exception as e:
