@@ -8,7 +8,8 @@ load_dotenv()
 
 def read_package_names(file_path):
     with open(file_path, "r") as f:
-        return [line.strip() for line in f.readlines()]
+        packages = [line.strip() for line in f.readlines()]
+    return packages if packages else ['dummy_value']  # Prevent SQL errors if file is empty
 
 # Connect to PostgreSQL
 db = psycopg2.connect(
@@ -22,7 +23,13 @@ db = psycopg2.connect(
 cursor = db.cursor()
 app_packages = read_package_names("packages.txt")
 
-# Function to fetch and store app data
+# ✅ FIX: Correct DELETE query (handle single package case)
+if app_packages:
+    cursor.execute("DELETE FROM apps WHERE package_name NOT IN %s", (tuple(app_packages),))
+    db.commit()
+    print("🗑️ Removed apps not in packages.txt")
+
+# Step 2: Fetch and store the latest data
 def fetch_and_store():
     for package in app_packages:
         try:
@@ -31,10 +38,10 @@ def fetch_and_store():
             name = data['title']
             version = data['version']
             icon_url = data['icon']
-            company = data.get('developer', 'Unknown')  # Fetch company name
-            screenshot_urls = ','.join(data['screenshots'])  # Store all available screenshots
+            company = data.get('developer', 'Unknown')  
+            screenshot_urls = ','.join(data['screenshots'])  
 
-            # Insert data into PostgreSQL table
+            # Insert or update the database
             sql = """
                 INSERT INTO apps (name, package_name, version, icon_url, screenshot_url, company)
                 VALUES (%s, %s, %s, %s, %s, %s)
@@ -50,9 +57,9 @@ def fetch_and_store():
             cursor.execute(sql, values)
             db.commit()
 
-            print(f"✅ Fetched and stored: {name} (Version: {version})")
+            print(f"✅ Updated: {name} (Version: {version})")
 
-            # Add a short delay to prevent getting blocked
+            # Short delay to prevent rate limiting
             time.sleep(2)
 
         except Exception as e:
