@@ -1,9 +1,9 @@
-com.fingersoft.hillclimb&pcampaignid
+com.supercell.brawlstars
+com.king.candycrushsaga
+com.miniclip.carrom
 com.supercell.clashofclans
-com.kiloo.subwaysurf&pcampaignid
-com.mojang.minecraftpe        
-com.robtopx.geometryjump      
-com.rockstargames.gtasa         
-com.riotgames.league.wildrift  
-com.kiloo.subwaysurf          
-com.miniclip.eightballpool     
+com.moonactive.coinmaster
+com.ea.gp.fifamobile
+com.miniclip.eightballpool
+com.mojang.minecraftpe
+com.kiloo.subwaysurf
