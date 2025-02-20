@@ -7,3 +7,8 @@ com.ea.gp.fifamobile
 com.miniclip.eightballpool
 com.mojang.minecraftpe
 com.kiloo.subwaysurf
+com.nekki.shadowfight3
+io.supercent.pizzaidle
+com.dreamgames.royalmatch
+com.easygames.race
+
