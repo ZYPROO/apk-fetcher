@@ -41,14 +41,16 @@ if apps_to_delete:
 
 # 🔹 Fetch and store only new/updated apps
 def fetch_and_store():
-    for package in apps_to_add_or_update:
+    for package in app_packages:  # Fetch all apps, not just new ones
         try:
             data = app(package)
             name = data['title']
             version = data['version']
             icon_url = data['icon']
-            company = data.get('developer', 'Unknown')  # Fetch company name
-            screenshot_urls = ','.join(data['screenshots'])  # Store all available screenshots
+            company = data.get('developer', 'Unknown')
+            screenshot_urls = ','.join(data['screenshots'])
+
+            print(f"📥 Fetching {name} - Version: {version}")  # DEBUGGING
 
             # 🔹 Insert or update app data
             sql = """
@@ -59,25 +61,22 @@ def fetch_and_store():
                     version = EXCLUDED.version, 
                     icon_url = EXCLUDED.icon_url, 
                     screenshot_url = EXCLUDED.screenshot_url,
-                    company = EXCLUDED.company
+                    company = EXCLUDED.company;
             """
             values = (name, package, version, icon_url, screenshot_urls, company)
             cursor.execute(sql, values)
             db.commit()
 
-            print(f"✅ Fetched and stored: {name} (Version: {version})")
+            print(f"✅ Updated: {name} (Version: {version})")  # DEBUGGING
 
-            # 🔹 Short delay to prevent blocking
+            # 🔹 Short delay to prevent API blocking
             time.sleep(1)
 
         except Exception as e:
             print(f"❌ Error fetching {package}: {e}")
 
 # 🔹 Run fetch function
-if apps_to_add_or_update:
-    fetch_and_store()
-else:
-    print("✅ All apps are up to date. No changes needed.")
+fetch_and_store()
 
 # 🔹 Close database connection
 cursor.close()

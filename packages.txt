@@ -11,4 +11,3 @@ com.nekki.shadowfight3
 io.supercent.pizzaidle
 com.dreamgames.royalmatch
 com.easygames.race
-
