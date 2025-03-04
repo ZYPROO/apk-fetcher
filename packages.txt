@@ -11,3 +11,8 @@ com.nekki.shadowfight3
 io.supercent.pizzaidle
 com.dreamgames.royalmatch
 com.easygames.race
+com.dts.freefiremax
+com.vincentb.MobControl
+com.snake.io.slither.worms
+com.playrix.gardenscapes
+com.playrix.township
