@@ -16,3 +16,6 @@ com.vincentb.MobControl
 com.snake.io.slither.worms
 com.playrix.gardenscapes
 com.playrix.township
+com.igg.android.lordsmobile
+com.nekki.shadowfightarena
+com.drivezone.car.race.game
