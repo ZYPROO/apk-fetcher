@@ -21,4 +21,3 @@ com.nekki.shadowfightarena
 com.drivezone.car.race.game
 com.axlebolt.standoff2
 com.innersloth.spacemafia
-com.plarium.mechlegion
